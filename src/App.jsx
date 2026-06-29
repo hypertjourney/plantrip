@@ -6,10 +6,14 @@ import { useSheetImages } from './hooks/useSheetImages'
 import DaySidebar from './components/DaySidebar'
 import Timeline from './components/Timeline'
 import MapView from './components/MapView'
+import RsvpModal from './components/RsvpModal'
+import CostView  from './components/CostView'
 
 export default function App() {
   const [selectedDay, setSelectedDay] = useState(1)
   const [selectedActivity, setSelectedActivity] = useState(null)
+  const [rsvpOpen, setRsvpOpen] = useState(false)
+  const [view, setView] = useState('trip') // 'trip' | 'costs'
 
   const { days: sheetDays, loading: itinLoading, error: itinError } = useSheetItinerary()
   const allDays = sheetDays ?? FALLBACK_DAYS
@@ -44,51 +48,55 @@ export default function App() {
           <h1 className="trip-title">{TRIP.title}</h1>
           <span className="trip-dates">{TRIP.subtitle}</span>
         </div>
+        <div className="header-center">
+          <nav className="header-nav">
+            <button
+              className={`header-nav-btn${view === 'trip'  ? ' header-nav-btn--on' : ''}`}
+              onClick={() => setView('trip')}
+            >Lịch trình</button>
+            <button
+              className={`header-nav-btn${view === 'costs' ? ' header-nav-btn--on' : ''}`}
+              onClick={() => setView('costs')}
+            >Chi phí</button>
+          </nav>
+        </div>
         <div className="header-right">
-          <div className="header-status">
-            <ItinStatus loading={itinLoading} error={itinError} isSheet={!!sheetDays} />
-            <ImageStatus loading={imagesLoading} error={imagesError} total={totalImages} />
-          </div>
+          <button className="rsvp-trigger" onClick={() => setRsvpOpen(true)}>
+            ✋ Xác nhận tham gia
+          </button>
           <p className="trip-desc">{TRIP.description}</p>
         </div>
       </header>
 
+      {rsvpOpen && <RsvpModal onClose={() => setRsvpOpen(false)} />}
+
       <div className="app-body">
-        <DaySidebar
-          days={allDays}
-          selectedDay={selectedDay}
-          onSelectDay={handleSelectDay}
-        />
-        <Timeline
-          day={day}
-          segmentMap={segmentMap}
-          selectedActivity={selectedActivity}
-          onSelectActivity={handleSelectActivity}
-        />
-        <MapView
-          day={day}
-          segments={segments}
-          routesLoading={routesLoading}
-          selectedActivity={selectedActivity}
-          onSelectActivity={handleSelectActivity}
-        />
+        {view === 'costs' ? (
+          <CostView />
+        ) : (
+          <>
+            <DaySidebar
+              days={allDays}
+              selectedDay={selectedDay}
+              onSelectDay={handleSelectDay}
+            />
+            <Timeline
+              day={day}
+              segmentMap={segmentMap}
+              selectedActivity={selectedActivity}
+              onSelectActivity={handleSelectActivity}
+            />
+            <MapView
+              day={day}
+              segments={segments}
+              routesLoading={routesLoading}
+              selectedActivity={selectedActivity}
+              onSelectActivity={handleSelectActivity}
+            />
+          </>
+        )}
       </div>
     </div>
   )
 }
 
-function ItinStatus({ loading, error, isSheet }) {
-  if (loading) return <span className="img-status img-status--loading">Đang tải lịch trình…</span>
-  if (error) return null // silently fall back to hardcoded, no noise
-  if (isSheet) return <span className="img-status img-status--ok">📋 Sheet</span>
-  return null
-}
-
-function ImageStatus({ loading, error, total }) {
-  if (loading) return <span className="img-status img-status--loading">Đang tải ảnh…</span>
-  if (error) return (
-    <span className="img-status img-status--error" title={error}>⚠ Ảnh lỗi</span>
-  )
-  if (total > 0) return <span className="img-status img-status--ok">📷 {total} ảnh</span>
-  return null
-}

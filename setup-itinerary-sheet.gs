@@ -7,6 +7,135 @@
  * App tự reload dữ liệu mỗi khi refresh trình duyệt.
  */
 
+/**
+ * Tự động tra tọa độ (lat/lng) từ tên + địa chỉ trong sheet,
+ * ghi đè vào cột H (Vĩ độ) và I (Kinh độ).
+ *
+ * Chạy: Extensions > Apps Script > chọn geocodeAllLocations > Run
+ * Cần bật Maps service: Services (+) > Maps > Add
+ */
+function geocodeAllLocations() {
+  const ss    = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName('Lịch trình');
+  if (!sheet) { SpreadsheetApp.getUi().alert('Không tìm thấy sheet "Lịch trình"'); return; }
+
+  const geo      = Maps.newGeocoder().setRegion('vn').setLanguage('vi');
+  const lastRow  = sheet.getLastRow();
+  const data     = sheet.getRange(2, 1, lastRow - 1, 9).getValues(); // A→I
+
+  let updated = 0, skipped = 0, failed = 0;
+  const log = [];
+
+  for (let i = 0; i < data.length; i++) {
+    const row      = i + 2; // dòng thực trong sheet (header = 1)
+    const type     = data[i][4]; // col E – Loại
+    const title    = data[i][5]; // col F – Tên hoạt động
+    const subtitle = data[i][6]; // col G – Địa điểm
+    const lat      = data[i][7]; // col H
+    const lng      = data[i][8]; // col I
+
+    // Bỏ qua hàng trống hoặc Di chuyển (không cần pin trên bản đồ)
+    if (!title || type === 'Di chuyển') { skipped++; continue; }
+
+    // Xây query: ưu tiên subtitle nếu trông như địa chỉ thật (có số / đường / xã / phường)
+    const hasAddress = subtitle && /\d|đường|phường|xã|ngõ|thôn|quận|huyện|tp\.|thành phố/i.test(subtitle);
+    const query = hasAddress
+      ? `${title} ${subtitle} Ninh Bình Vietnam`
+      : `${title} Ninh Bình Vietnam`;
+
+    try {
+      const result = geo.geocode(query);
+      if (result.status === 'OK' && result.results.length > 0) {
+        const loc = result.results[0].geometry.location;
+        sheet.getRange(row, 8).setValue(loc.lat); // H – Vĩ độ
+        sheet.getRange(row, 9).setValue(loc.lng); // I – Kinh độ
+        log.push(`✅ [${data[i][0]}] ${title}\n     → ${loc.lat.toFixed(6)}, ${loc.lng.toFixed(6)}\n     (query: ${query})`);
+        updated++;
+      } else {
+        log.push(`⚠ [${data[i][0]}] ${title} — không tìm được (status: ${result.status})`);
+        failed++;
+      }
+    } catch (e) {
+      log.push(`❌ [${data[i][0]}] ${title} — lỗi: ${e.message}`);
+      failed++;
+    }
+
+    Utilities.sleep(300); // tránh rate limit Maps API
+  }
+
+  SpreadsheetApp.flush();
+
+  const summary =
+    `🗺  Geocode xong!\n\n` +
+    `✅ Cập nhật: ${updated} địa điểm\n` +
+    `⏭  Bỏ qua:  ${skipped} hàng (Di chuyển / trống)\n` +
+    `⚠  Lỗi:     ${failed} địa điểm\n\n` +
+    `--- Chi tiết ---\n${log.join('\n')}`;
+
+  Logger.log(summary);
+  SpreadsheetApp.getUi().alert(summary);
+}
+
+/**
+ * Geocode 1 dòng cụ thể để kiểm tra, không ghi vào sheet.
+ * Đổi QUERY bên dưới rồi Run → xem kết quả ở View > Logs
+ */
+function testGeocode() {
+  const QUERY = 'Phố Cổ Hoa Lư Ninh Bình Vietnam';
+  const geo    = Maps.newGeocoder().setRegion('vn');
+  const result = geo.geocode(QUERY);
+  if (result.status === 'OK') {
+    const loc = result.results[0].geometry.location;
+    Logger.log(`Query: ${QUERY}\nKết quả: ${loc.lat}, ${loc.lng}\nĐịa chỉ đầy đủ: ${result.results[0].formatted_address}`);
+  } else {
+    Logger.log('Không tìm được. Status: ' + result.status);
+  }
+}
+
+/**
+ * Nhận phản hồi từ app và ghi vào sheet "Phản hồi".
+ * Deploy: Deploy > New deployment > Web app
+ *   Execute as: Me
+ *   Who has access: Anyone
+ * Sau khi deploy → copy URL → dán vào VITE_RSVP_URL trong .env.local
+ */
+function doPost(e) {
+  try {
+    const ss   = SpreadsheetApp.getActiveSpreadsheet()
+    let sheet  = ss.getSheetByName('Phản hồi')
+
+    if (!sheet) {
+      sheet = ss.insertSheet('Phản hồi')
+      const hdr = sheet.getRange(1, 1, 1, 5)
+      hdr.setValues([['Thời gian', 'Tên', 'Điểm (1-10)', 'Ý kiến đóng góp', 'Địa điểm muốn thêm']])
+      hdr.setBackground('#1C2C1F').setFontColor('#FFFFFF').setFontWeight('bold').setFontSize(11)
+      sheet.setFrozenRows(1)
+      sheet.setColumnWidth(1, 165)
+      sheet.setColumnWidth(2, 110)
+      sheet.setColumnWidth(3,  95)
+      sheet.setColumnWidth(4, 420)
+      sheet.setColumnWidth(5, 420)
+    }
+
+    const body = JSON.parse(e.postData.contents)
+    sheet.appendRow([
+      new Date(),
+      body.name    || '',
+      body.rating  || '',
+      body.opinion || '',
+      body.places  || '',
+    ])
+
+    return ContentService
+      .createTextOutput(JSON.stringify({ ok: true }))
+      .setMimeType(ContentService.MimeType.JSON)
+  } catch (err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ ok: false, error: err.message }))
+      .setMimeType(ContentService.MimeType.JSON)
+  }
+}
+
 function setupItinerarySheet() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
 
@@ -71,7 +200,7 @@ function setupItinerarySheet() {
 
     ['d1-4',1,'20:00','21:30','Tham quan',
      'Phố Cổ Hoa Lư','Cố đô nghìn năm · buổi tối',
-     20.2798,105.9494,
+     20.2633839,105.9681679,
      '',
      'Tản bộ quanh khu đền Đinh Tiên Hoàng và Lê Đại Hành — kinh đô đầu tiên của Đại Việt thế kỷ X. Đêm đèn thờ lung linh, ít khách hơn ban ngày.',
      'Vé vào: 20.000đ. Mang theo đèn pin. Đừng bỏ qua Sơn Lăng và giếng cổ.'],
@@ -86,7 +215,7 @@ function setupItinerarySheet() {
 
     ['d2-2',2,'08:00','12:00','Tham quan',
      'Tràng An','Di sản Thế giới UNESCO · Thuyền hang động',
-     20.2590,105.9097,
+     20.252551,105.9183742,
      'Xe máy',
      'Chèo thuyền qua hệ thống 48 hang động và hồ nước trong vắt. Tour đầy đủ khoảng 3–3.5 giờ qua 3 hang chính. Sáng sớm đẹp nhất.',
      'Vé: 250.000đ/người (gồm người chèo thuyền). Đặt sớm lúc 8h để tránh chen.'],
