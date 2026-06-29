@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { useSheetCosts } from '../hooks/useSheetCosts'
 
+const PEOPLE = 16
+
 const CATEGORIES = ['Di chuyển', 'Lưu trú', 'Ăn uống', 'Tham quan', 'Khác']
 const CAT_ICON = { 'Di chuyển': '🚌', 'Lưu trú': '🏨', 'Ăn uống': '🍽️', 'Tham quan': '🗺️', 'Khác': '📦' }
 const DAY_LABEL = { 1: 'Ngày 1 · Thứ 6', 2: 'Ngày 2 · Thứ 7', 3: 'Ngày 3 · CN', null: 'Chung', '': 'Chung' }
@@ -153,6 +155,12 @@ export default function CostView() {
             value={Math.abs(diff)}
             sub={diff > 0 ? '▲ vượt dự trù' : diff < 0 ? '▼ tiết kiệm' : 'đúng dự trù'}
             accent={diff > 0 ? '#B03030' : '#237E38'}
+          />
+          <SummaryCard
+            label={`Mỗi người · ${PEOPLE} người`}
+            value={(actualTotal || budgetTotal) / PEOPLE}
+            sub={actualTotal ? 'theo thực tế' : 'theo dự trù'}
+            accent="#237E38"
           />
         </div>
 

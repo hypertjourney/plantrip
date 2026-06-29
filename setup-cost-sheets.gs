@@ -29,7 +29,7 @@ function _setupBudgetSheet(ss) {
 
   // ─ Data ────────────────────────────────────────────────────
   // [Ngày, Danh mục, Khoản mục, Đơn giá, Số lượng, Đơn vị, Thành tiền, Ghi chú]
-  const SL = 6; // số người — đổi theo nhóm
+  const SL = 16; // số người — xe 16 chỗ
   const rows = [
     // ─ Ngày 1 ─
     [1,'Di chuyển', 'Xe 16 chỗ HN → Ninh Bình',  1500000, 1,  'chuyến', '=D2*E2',   'Chia đều cho cả nhóm'],
@@ -82,7 +82,7 @@ function _setupBudgetSheet(ss) {
   // Per-person tổng
   const ppRow = totalRow + 1;
   sheet.getRange(ppRow, 6, 1, 2)
-    .setValues([[`Mỗi người (/${SL})`, `=G${totalRow}/${SL}`]]);
+    .setValues([[`Mỗi người (/${SL} người)`, `=G${totalRow}/${SL}`]]);
   sheet.getRange(ppRow, 7).setNumberFormat('#,##0 "đ"').setFontWeight('bold');
 
   // Column widths
