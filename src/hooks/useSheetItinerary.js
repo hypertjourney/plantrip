@@ -50,9 +50,10 @@ function parseRows(rows) {
     const subtitle = str(c[6]?.v)
     const lat     = num(c[7]?.v)
     const lng     = num(c[8]?.v)
-    const travelMode = str(c[9]?.v)
+    const travelMode  = str(c[9]?.v)
     const description = str(c[10]?.v)
-    const tips    = str(c[11]?.v)
+    const tips        = str(c[11]?.v)
+    const link        = str(c[12]?.v)
 
     // Skip rows with no day or no title
     if (!dayNum || !title) continue
@@ -68,6 +69,7 @@ function parseRows(rows) {
       tips,
       coords: lat && lng ? [lat, lng] : null,
       travelToNext: travelMode ? { distance: '', time: '', mode: travelMode } : null,
+      link: link || null,
       images: [],
     }
 

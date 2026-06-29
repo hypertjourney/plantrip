@@ -28,7 +28,7 @@ export default function App() {
     activities: rawDay.activities.map(act => ({
       ...act,
       images: imageMap[act.id] ?? [],
-      articleLink: linkMap[act.id] ?? null,
+      articleLink: act.link || linkMap[act.id] || null,
     })),
   }), [rawDay, imageMap, linkMap])
 
