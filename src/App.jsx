@@ -3,11 +3,14 @@ import { DAYS as FALLBACK_DAYS, TRIP } from './data/itinerary'
 import { useSheetItinerary } from './hooks/useSheetItinerary'
 import { useRoutes } from './hooks/useRoutes'
 import { useSheetImages } from './hooks/useSheetImages'
+import { useSheetFeedback } from './hooks/useSheetFeedback'
 import DaySidebar from './components/DaySidebar'
 import Timeline from './components/Timeline'
 import MapView from './components/MapView'
 import RsvpModal from './components/RsvpModal'
 import CostView  from './components/CostView'
+
+const PEOPLE = 16
 
 export default function App() {
   const [selectedDay, setSelectedDay] = useState(1)
@@ -16,6 +19,7 @@ export default function App() {
   const [view, setView] = useState('trip') // 'trip' | 'costs'
 
   const { days: sheetDays, loading: itinLoading, error: itinError } = useSheetItinerary()
+  const { count: confirmedCount } = useSheetFeedback()
   const allDays = sheetDays ?? FALLBACK_DAYS
 
   const rawDay = allDays.find(d => d.id === selectedDay) ?? allDays[0]
@@ -61,6 +65,10 @@ export default function App() {
           </nav>
         </div>
         <div className="header-right">
+          <div className="trip-attendance">
+            <span className="trip-attendance__count">{confirmedCount}/{PEOPLE}</span>
+            <span className="trip-attendance__label">đã xác nhận</span>
+          </div>
           <button className="rsvp-trigger" onClick={() => setRsvpOpen(true)}>
             ✋ Xác nhận tham gia
           </button>
