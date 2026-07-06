@@ -10,7 +10,7 @@ import MapView from './components/MapView'
 import RsvpModal from './components/RsvpModal'
 import CostView  from './components/CostView'
 
-const PEOPLE = 16
+const PEOPLE = 18
 
 export default function App() {
   const [selectedDay, setSelectedDay] = useState(1)

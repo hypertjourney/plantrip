@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useSheetCosts } from "../hooks/useSheetCosts";
 import { useSheetFeedback } from "../hooks/useSheetFeedback";
 
-const PEOPLE = 16;
+const PEOPLE = 18;
 const MOMO_URL = "https://quy.momo.vn/v2/M-N3UmCQkU?cover=6749";
 const DEPOSIT_PER_PERSON = 1_500_000;
 
