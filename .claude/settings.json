@@ -1,7 +1,18 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "WebFetch(domain:www.klook.com)",
+      "WebSearch",
+      "WebFetch(domain:anhhungcolau.vn)",
+      "WebFetch(domain:ticketgo.vn)",
+      "Bash(google-chrome --headless --disable-gpu --no-sandbox --window-size=1600,1400 --screenshot=/tmp/claude-1000/-home-tuannm-BraveStars-plantrip/4c6e1fd0-a195-4c70-b316-56872487032e/scratchpad/day2.png http://localhost:5175/plantrip/ --virtual-time-budget=4000)",
+      "Bash(python3 -c ' *)",
+      "Bash(google-chrome --headless --disable-gpu --no-sandbox --window-size=1600,4200 --screenshot=/tmp/claude-1000/-home-tuannm-BraveStars-plantrip/4c6e1fd0-a195-4c70-b316-56872487032e/scratchpad/day2-full2.png http://localhost:5175/plantrip/ --virtual-time-budget=6000)",
+      "Bash(google-chrome --headless --disable-gpu --no-sandbox --dump-dom \"http://localhost:5175/plantrip/\" --virtual-time-budget=6000)",
+      "Bash(pkill -f \"vite\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:5173/plantrip/)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:5175/plantrip/)"
     ]
   }
 }

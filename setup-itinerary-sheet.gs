@@ -93,7 +93,8 @@ function testGeocode() {
 }
 
 /**
- * Nhận phản hồi từ app và ghi vào sheet "Phản hồi".
+ * Nhận phản hồi từ app và ghi vào sheet "Phản hồi", hoặc nếu là bình chọn
+ * đêm 2 (body.type === 'night2vote') thì ghi vào sheet "Khảo sát đêm 2".
  * Deploy: Deploy > New deployment > Web app
  *   Execute as: Me
  *   Who has access: Anyone
@@ -102,7 +103,28 @@ function testGeocode() {
 function doPost(e) {
   try {
     const ss   = SpreadsheetApp.getActiveSpreadsheet()
-    let sheet  = ss.getSheetByName('Phản hồi')
+    const body = JSON.parse(e.postData.contents)
+
+    if (body.type === 'night2vote') {
+      let sheet = ss.getSheetByName('Khảo sát đêm 2')
+      if (!sheet) {
+        sheet = ss.insertSheet('Khảo sát đêm 2')
+        const hdr = sheet.getRange(1, 1, 1, 3)
+        hdr.setValues([['Thời gian', 'Tên', 'Lựa chọn']])
+        hdr.setBackground('#2C1A4A').setFontColor('#FFFFFF').setFontWeight('bold').setFontSize(11)
+        sheet.setFrozenRows(1)
+        sheet.setColumnWidth(1, 165)
+        sheet.setColumnWidth(2, 110)
+        sheet.setColumnWidth(3, 140)
+      }
+      sheet.appendRow([new Date(), body.name || '', body.night2 || ''])
+
+      return ContentService
+        .createTextOutput(JSON.stringify({ ok: true }))
+        .setMimeType(ContentService.MimeType.JSON)
+    }
+
+    let sheet = ss.getSheetByName('Phản hồi')
 
     if (!sheet) {
       sheet = ss.insertSheet('Phản hồi')
@@ -117,7 +139,6 @@ function doPost(e) {
       sheet.setColumnWidth(5, 420)
     }
 
-    const body = JSON.parse(e.postData.contents)
     sheet.appendRow([
       new Date(),
       body.name    || '',

@@ -1,7 +1,11 @@
 import ActivityCard from './ActivityCard'
+import ShowBanner from './ShowBanner'
+import Night2Poll from './Night2Poll'
 import { fmtDistance, fmtDuration } from '../hooks/useRoutes'
 
-export default function Timeline({ day, segmentMap, selectedActivity, onSelectActivity }) {
+const isShowActivity = (a) => a.id === 'd2-8' || /cờ lau/i.test(a.title || '')
+
+export default function Timeline({ day, segmentMap, selectedActivity, onSelectActivity, night2Tally, night2Total, onOpenVote }) {
   const acts = day.activities
 
   return (
@@ -16,16 +20,27 @@ export default function Timeline({ day, segmentMap, selectedActivity, onSelectAc
         {acts.map((activity, index) => {
           const next = acts[index + 1]
           const seg = next ? segmentMap[`${activity.id}-${next.id}`] : null
+          const isShow = isShowActivity(activity)
 
           return (
             <li key={activity.id} className="activities-item">
-              <ActivityCard
-                activity={activity}
-                accent={day.accent}
-                index={index + 1}
-                isSelected={selectedActivity === activity.id}
-                onClick={() => onSelectActivity(activity.id)}
-              />
+              {isShow && (
+                <div className="timeline-extra">
+                  <Night2Poll tally={night2Tally} total={night2Total} onOpenVote={onOpenVote} />
+                </div>
+              )}
+
+              {isShow ? (
+                <ShowBanner activity={activity} />
+              ) : (
+                <ActivityCard
+                  activity={activity}
+                  accent={day.accent}
+                  index={index + 1}
+                  isSelected={selectedActivity === activity.id}
+                  onClick={() => onSelectActivity(activity.id)}
+                />
+              )}
 
               {index < acts.length - 1 && (
                 <div className="connector" style={{ '--accent': day.accent }}>

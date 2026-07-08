@@ -177,7 +177,7 @@ export default function CostView() {
 
   const diff = actualTotal - budgetTotal;
   const hasData = budget.length > 0;
-  const perPerson = (actualTotal || budgetTotal) / PEOPLE;
+  const perPerson = (actualTotal || budgetTotal) / 16;
   const fundContribution = Math.max(0, perPerson - DEPOSIT_PER_PERSON);
 
   return (
