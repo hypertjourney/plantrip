@@ -12,7 +12,17 @@
       "Bash(google-chrome --headless --disable-gpu --no-sandbox --dump-dom \"http://localhost:5175/plantrip/\" --virtual-time-budget=6000)",
       "Bash(pkill -f \"vite\")",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:5173/plantrip/)",
-      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:5175/plantrip/)"
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:5175/plantrip/)",
+      "Bash(curl -sL -X POST 'https://script.google.com/macros/s/AKfycbxqwAoccIYM2LLhJTQAYeYkj4UOj_2gD_yZdjjUem1UzXwpKxDWmDFrhKKl2gzr03gJAw/exec' -H 'Content-Type: text/plain' -d '{\"type\":\"night2vote\",\"name\":\"__debug_test__\",\"night2\":\"show\"}')",
+      "Bash(curl -sI 'https://script.google.com/macros/s/AKfycbxqwAoccIYM2LLhJTQAYeYkj4UOj_2gD_yZdjjUem1UzXwpKxDWmDFrhKKl2gzr03gJAw/exec' -X POST -H 'Content-Type: text/plain' --data '{\"type\":\"night2vote\",\"name\":\"t\",\"night2\":\"show\"}' -o /dev/null -w 'HTTP:%{http_code} url_effective:%{url_effective}\\\\n' -L)",
+      "Bash(curl -s -o /dev/null -w 'HTTP:%{http_code} url_effective:%{url_effective}\\\\n' -L 'https://script.google.com/macros/s/AKfycbxqwAoccIYM2LLhJTQAYeYkj4UOj_2gD_yZdjjUem1UzXwpKxDWmDFrhKKl2gzr03gJAw/exec')",
+      "Bash(curl -s -X POST 'https://script.google.com/macros/s/AKfycbxqwAoccIYM2LLhJTQAYeYkj4UOj_2gD_yZdjjUem1UzXwpKxDWmDFrhKKl2gzr03gJAw/exec' -H 'Content-Type: text/plain' --data '{\"type\":\"night2vote\",\"name\":\"t\",\"night2\":\"show\"}' -o /tmp/claude-1000/-home-tuannm-BraveStars-plantrip/fdb6c08a-3b9a-48ae-a036-233c48cfca2f/scratchpad/resp.html -w 'HTTP:%{http_code}\\\\n' -L)",
+      "Bash(curl -s -D - -X POST 'https://script.google.com/macros/s/AKfycbxqwAoccIYM2LLhJTQAYeYkj4UOj_2gD_yZdjjUem1UzXwpKxDWmDFrhKKl2gzr03gJAw/exec' -H 'Content-Type: text/plain' --data '{\"type\":\"night2vote\",\"name\":\"t\",\"night2\":\"show\"}' -o /dev/null)",
+      "Bash(curl -sL -X POST 'https://script.google.com/macros/s/AKfycbxqwAoccIYM2LLhJTQAYeYkj4UOj_2gD_yZdjjUem1UzXwpKxDWmDFrhKKl2gzr03gJAw/exec' -H 'Content-Type: text/plain' --data '{\"type\":\"night2vote\",\"name\":\"__debug_test__\",\"night2\":\"show\"}' -w '\\\\nHTTP:%{http_code}\\\\n')",
+      "Bash(curl -sL 'https://script.google.com/macros/s/AKfycbxqwAoccIYM2LLhJTQAYeYkj4UOj_2gD_yZdjjUem1UzXwpKxDWmDFrhKKl2gzr03gJAw/exec')",
+      "Read(//home/tuannm/**)",
+      "Bash(npm ls *)",
+      "Bash(npx vite *)"
     ]
   }
 }

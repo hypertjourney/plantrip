@@ -3,7 +3,7 @@ import { NIGHT2_OPTIONS } from './Night2Poll'
 
 const RSVP_URL = import.meta.env.VITE_RSVP_URL || ''
 
-export default function Night2VoteModal({ onClose }) {
+export default function Night2VoteModal({ onClose, onVoted }) {
   const [name,   setName]   = useState('')
   const [choice, setChoice] = useState(null)
   const [status, setStatus] = useState('idle') // idle | submitting | success | error
@@ -22,6 +22,8 @@ export default function Night2VoteModal({ onClose }) {
         body: JSON.stringify({ type: 'night2vote', name: name.trim(), night2: choice }),
       })
       setStatus('success')
+      // gviz read of the sheet lags slightly behind the write, so delay the refetch
+      setTimeout(() => onVoted?.(), 1200)
     } catch {
       setStatus('error')
     }

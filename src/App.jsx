@@ -23,7 +23,7 @@ export default function App() {
 
   const { days: sheetDays, loading: itinLoading, error: itinError } = useSheetItinerary()
   const { count: confirmedCount } = useSheetFeedback()
-  const { tally: night2Tally, total: night2Total } = useNight2Poll()
+  const { tally: night2Tally, total: night2Total, reload: reloadNight2Poll } = useNight2Poll()
   const allDays = sheetDays ?? FALLBACK_DAYS
 
   const rawDay = allDays.find(d => d.id === selectedDay) ?? allDays[0]
@@ -81,7 +81,7 @@ export default function App() {
       </header>
 
       {rsvpOpen && <RsvpModal onClose={() => setRsvpOpen(false)} />}
-      {voteOpen && <Night2VoteModal onClose={() => setVoteOpen(false)} />}
+      {voteOpen && <Night2VoteModal onClose={() => setVoteOpen(false)} onVoted={reloadNight2Poll} />}
 
       <div className="app-body">
         {view === 'costs' ? (
