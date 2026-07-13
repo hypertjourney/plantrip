@@ -30,22 +30,25 @@ export function useNight2Poll() {
   const [votes, setVotes] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError]   = useState(null)
-  const [reloadKey, setReloadKey] = useState(0)
 
-  useEffect(() => {
-    let cancelled = false
+  async function fetchVotes() {
     setLoading(true)
-    fetch(sheetUrl('Khảo sát đêm 2'))
-      .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.text() })
-      .then(text => {
-        const json = parseGviz(text)
-        const rows = json?.table?.rows ?? []
-        if (!cancelled) setVotes(parseVoteRows(rows))
-      })
-      .catch(e => { if (!cancelled) setError(e.message) })
-      .finally(() => { if (!cancelled) setLoading(false) })
-    return () => { cancelled = true }
-  }, [reloadKey])
+    try {
+      const r = await fetch(sheetUrl('Khảo sát đêm 2'))
+      if (!r.ok) throw new Error(`HTTP ${r.status}`)
+      const text = await r.text()
+      const json = parseGviz(text)
+      const rows = json?.table?.rows ?? []
+      setVotes(parseVoteRows(rows))
+      setError(null)
+    } catch (e) {
+      setError(e.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => { fetchVotes() }, [])
 
   const tally = votes.reduce((acc, v) => {
     if (acc[v.choice] !== undefined) acc[v.choice] += 1
@@ -53,9 +56,5 @@ export function useNight2Poll() {
   }, { show: 0, karaoke: 0, poker: 0 })
   const total = tally.show + tally.karaoke + tally.poker
 
-  function reload() {
-    setReloadKey(k => k + 1)
-  }
-
-  return { votes, tally, total, loading, error, reload }
+  return { votes, tally, total, loading, error, reload: fetchVotes }
 }

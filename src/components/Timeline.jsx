@@ -3,7 +3,7 @@ import ShowBanner from './ShowBanner'
 import Night2Poll from './Night2Poll'
 import { fmtDistance, fmtDuration } from '../hooks/useRoutes'
 
-const isShowActivity = (a) => a.id === 'd2-8' || /cờ lau/i.test(a.title || '')
+const isShowActivity = (a) => /cờ lau/i.test(a.title || '')
 
 export default function Timeline({ day, segmentMap, selectedActivity, onSelectActivity, night2Tally, night2Total, onOpenVote }) {
   const acts = day.activities

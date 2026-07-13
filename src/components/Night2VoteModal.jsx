@@ -1,12 +1,13 @@
 import { useState } from 'react'
-import { NIGHT2_OPTIONS } from './Night2Poll'
+import { NIGHT2_OPTIONS, Night2ResultsList } from './Night2Poll'
 
 const RSVP_URL = import.meta.env.VITE_RSVP_URL || ''
 
-export default function Night2VoteModal({ onClose, onVoted }) {
+export default function Night2VoteModal({ onClose, onVoted, tally, total }) {
   const [name,   setName]   = useState('')
   const [choice, setChoice] = useState(null)
   const [status, setStatus] = useState('idle') // idle | submitting | success | error
+  const [refreshed, setRefreshed] = useState(false)
 
   const canSubmit = name.trim() && choice !== null
 
@@ -23,7 +24,10 @@ export default function Night2VoteModal({ onClose, onVoted }) {
       })
       setStatus('success')
       // gviz read of the sheet lags slightly behind the write, so delay the refetch
-      setTimeout(() => onVoted?.(), 1200)
+      setTimeout(async () => {
+        await onVoted?.()
+        setRefreshed(true)
+      }, 1200)
     } catch {
       setStatus('error')
     }
@@ -40,6 +44,15 @@ export default function Night2VoteModal({ onClose, onVoted }) {
             <p className="rsvp-success__body">
               Cảm ơn <strong>{name}</strong> đã bình chọn cho đêm thứ 2.
             </p>
+
+            <div className="rsvp-success__results">
+              {refreshed ? (
+                <Night2ResultsList tally={tally} total={total} />
+              ) : (
+                <p className="rsvp-success__loading">Đang tải kết quả mới nhất…</p>
+              )}
+            </div>
+
             <button className="rsvp-btn-primary" onClick={onClose}>Đóng</button>
           </div>
         ) : (

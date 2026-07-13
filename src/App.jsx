@@ -81,7 +81,14 @@ export default function App() {
       </header>
 
       {rsvpOpen && <RsvpModal onClose={() => setRsvpOpen(false)} />}
-      {voteOpen && <Night2VoteModal onClose={() => setVoteOpen(false)} onVoted={reloadNight2Poll} />}
+      {voteOpen && (
+        <Night2VoteModal
+          onClose={() => setVoteOpen(false)}
+          onVoted={reloadNight2Poll}
+          tally={night2Tally}
+          total={night2Total}
+        />
+      )}
 
       <div className="app-body">
         {view === 'costs' ? (

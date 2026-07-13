@@ -22,7 +22,12 @@
       "Bash(curl -sL 'https://script.google.com/macros/s/AKfycbxqwAoccIYM2LLhJTQAYeYkj4UOj_2gD_yZdjjUem1UzXwpKxDWmDFrhKKl2gzr03gJAw/exec')",
       "Read(//home/tuannm/**)",
       "Bash(npm ls *)",
-      "Bash(npx vite *)"
+      "Bash(npx vite *)",
+      "Bash(lsof -i :5173 -sTCP:LISTEN)",
+      "Bash(lsof -i :5174 -sTCP:LISTEN)",
+      "Bash(kill 4001227)",
+      "Read(//proc/sys/fs/inotify/**)",
+      "Bash(ulimit -n)"
     ]
   }
 }

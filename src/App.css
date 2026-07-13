@@ -1101,6 +1101,18 @@ body {
   color: var(--text-2);
   line-height: 1.6;
 }
+.rsvp-success__results {
+  width: 100%;
+  margin: 4px 0 4px;
+  text-align: left;
+}
+.rsvp-success__results .night2-poll__options { margin-bottom: 0; }
+.rsvp-success__loading {
+  font-size: 12.5px;
+  color: var(--text-2);
+  text-align: center;
+  padding: 10px 0;
+}
 .rsvp-success .rsvp-btn-primary {
   margin-top: 8px;
   width: auto;
